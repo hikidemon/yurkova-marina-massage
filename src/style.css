@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #1A2226;
+  --color-brand-light: #2A363B;
+  --color-brand-dark: #0D1416;
+  --color-gold: #D49A6A;
+  --color-gold-light: #E8BC96;
+  --color-terracotta: #C47A5A;
+  --color-cream: #F0EBE4;
+  --color-cream-light: #F8F4EF;
+  --color-charcoal: #161412;
+  --color-sage: #8FA093;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-cream-light);
+  color: var(--color-charcoal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-display);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+::selection {
+  background-color: #D49A6A;
+  color: #F8F4EF;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-sage), transparent);
+  opacity: 0.2;
+}
+
+.card-shadow {
+  box-shadow: 0 1px 3px rgba(26, 34, 38, 0.04), 0 4px 12px rgba(26, 34, 38, 0.06);
+}
+
+.card-shadow-hover {
+  transition: box-shadow 0.4s ease, transform 0.4s ease;
+}
+
+.card-shadow-hover:hover {
+  box-shadow: 0 4px 16px rgba(26, 34, 38, 0.08), 0 12px 32px rgba(26, 34, 38, 0.06);
+  transform: translateY(-2px);
+}
+
+.accent-gradient {
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-light));
+}
+
+.fade-mask-bottom {
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-sage);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-light);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-sage) transparent;
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-sage);
+  border-radius: 2px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out forwards;
+}

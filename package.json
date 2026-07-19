@@ -1,0 +1,33 @@
+{
+  "name": "massage-salon-new",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react-lazy-load-image-component": "^1.6.5",
+    "@vitejs/plugin-react": "^6.0.3",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.110.7",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "framer-motion": "^12.42.2",
+    "ogl": "^1.0.11",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-dropzone": "^19.1.0",
+    "react-icons": "^5.7.0",
+    "react-lazy-load-image-component": "^1.6.3",
+    "react-router-dom": "^7.18.1",
+    "supabase": "^2.109.1"
+  }
+}
