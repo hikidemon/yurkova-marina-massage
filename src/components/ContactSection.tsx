@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { FiPhone, FiMapPin, FiClock, FiSend } from 'react-icons/fi'
+import { FiPhone, FiMapPin, FiClock } from 'react-icons/fi'
 
 export default function ContactSection() {
   return (
@@ -82,13 +82,7 @@ export default function ContactSection() {
                 <FiPhone size={16} />
                 Позвонить сейчас
               </a>
-              <a
-                href="tel:+79050715262"
-                className="inline-flex items-center gap-2 px-8 py-3.5 border border-cream/20 text-cream-light font-semibold rounded-full hover:bg-cream/10 transition-all text-sm"
-              >
-                <FiSend size={16} />
-                Написать в WhatsApp
-              </a>
+
             </div>
           </motion.div>
 
