@@ -94,7 +94,7 @@ export default function ContactSection() {
             className="rounded-2xl overflow-hidden shadow-xl h-[400px] lg:h-[500px] ring-1 ring-white/10"
           >
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2514.719!2d86.6481208!3d53.9834806!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x42d742e4cd2cf137%3A0xb5646524c31b54ad!2z0YPQuy4gNTAg0LvQtdGCINCz0L7RgNC40LTQsCwgNywg0JrQuNGB0LXQu9GR0LLRgdC6LCDQmtC10LzQtdGA0L7QstGB0LrQsNGPINC-0LHQuy4sIDY1MjcyMA!5e0!3m2!1sru!2sru!4v1"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2345.133806838386!2d86.5541877767999!3d54.00040047248616!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x42da0052e3b830cd%3A0x8c5a5127616be9b6!2sAssol%2C%20hotel%20and%20recreation%20complex!5e0!3m2!1sen!2sru!4v1784475110041!5m2!1sen!2sru"
               width="100%"
               height="100%"
               style={{ border: 0 }}
