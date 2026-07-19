@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient'
+import { supabase, isConfigured } from './supabaseClient'
 
 export interface Detail {
   name: string
@@ -25,8 +25,13 @@ export interface Training {
   details: Detail[]
 }
 
+function checkConfig() {
+  if (!isConfigured) throw new Error('Supabase not configured')
+}
+
 export async function getServices(): Promise<Service[]> {
-  const { data, error } = await supabase
+  checkConfig()
+  const { data, error } = await supabase!
     .from('Services')
     .select('*')
     .order('id')
@@ -35,7 +40,8 @@ export async function getServices(): Promise<Service[]> {
 }
 
 export async function addService(service: Omit<Service, 'id'>): Promise<Service> {
-  const { data, error } = await supabase
+  checkConfig()
+  const { data, error } = await supabase!
     .from('Services')
     .insert([service])
     .select()
@@ -45,7 +51,8 @@ export async function addService(service: Omit<Service, 'id'>): Promise<Service>
 }
 
 export async function updateService(id: number, updates: Partial<Service>): Promise<Service> {
-  const { data, error } = await supabase
+  checkConfig()
+  const { data, error } = await supabase!
     .from('Services')
     .update(updates)
     .eq('id', id)
@@ -56,7 +63,8 @@ export async function updateService(id: number, updates: Partial<Service>): Prom
 }
 
 export async function deleteService(id: number): Promise<void> {
-  const { error } = await supabase
+  checkConfig()
+  const { error } = await supabase!
     .from('Services')
     .delete()
     .eq('id', id)
@@ -64,7 +72,8 @@ export async function deleteService(id: number): Promise<void> {
 }
 
 export async function getTrainings(): Promise<Training[]> {
-  const { data, error } = await supabase
+  checkConfig()
+  const { data, error } = await supabase!
     .from('Training')
     .select('*')
     .order('id')
@@ -73,7 +82,8 @@ export async function getTrainings(): Promise<Training[]> {
 }
 
 export async function addTraining(training: Omit<Training, 'id'>): Promise<Training> {
-  const { data, error } = await supabase
+  checkConfig()
+  const { data, error } = await supabase!
     .from('Training')
     .insert([training])
     .select()
@@ -83,7 +93,8 @@ export async function addTraining(training: Omit<Training, 'id'>): Promise<Train
 }
 
 export async function updateTraining(id: number, updates: Partial<Training>): Promise<Training> {
-  const { data, error } = await supabase
+  checkConfig()
+  const { data, error } = await supabase!
     .from('Training')
     .update(updates)
     .eq('id', id)
@@ -94,7 +105,8 @@ export async function updateTraining(id: number, updates: Partial<Training>): Pr
 }
 
 export async function deleteTraining(id: number): Promise<void> {
-  const { error } = await supabase
+  checkConfig()
+  const { error } = await supabase!
     .from('Training')
     .delete()
     .eq('id', id)
