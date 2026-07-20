@@ -15,6 +15,20 @@ export interface Service {
   details: Detail[]
 }
 
+const DURATION_KEY = '__duration__'
+
+export function getServiceDuration(service: Service): string {
+  return service.details?.find(d => d.name === DURATION_KEY)?.duration || ''
+}
+
+export function setServiceDuration(details: Detail[], duration: string): Detail[] {
+  const cleaned = details.filter(d => d.name !== DURATION_KEY)
+  if (duration) {
+    return [{ name: DURATION_KEY, duration, price: '' }, ...cleaned]
+  }
+  return cleaned
+}
+
 export interface Training {
   id: number
   title: string

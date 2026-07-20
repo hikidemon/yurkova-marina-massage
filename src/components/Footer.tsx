@@ -12,8 +12,7 @@ export default function Footer() {
                 <img src={logo} alt="" className="h-full w-full object-cover" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-cream font-display">Марина Юркова</p>
-                <p className="text-[10px] text-cream/40 uppercase tracking-widest">Массажный кабинет</p>
+                <p className="text-sm font-semibold text-cream font-display">Marina Yurkova massage</p>
               </div>
             </div>
             <p className="text-sm leading-relaxed text-cream/50">

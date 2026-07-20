@@ -184,13 +184,14 @@ export default function TrainingSection() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
                 <div className="p-5 sm:p-6">
-                  {item.duration && (
-                    <div className="flex items-center gap-1.5 text-xs text-brand/60 mb-2">
-                      <FiClock size={12} />
-                      <span>{item.duration}</span>
-                    </div>
-                  )}
-                  <h3 className="text-lg font-display text-brand-dark font-semibold mb-2">{item.title}</h3>
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <h3 className="text-lg font-display text-brand-dark font-semibold">{item.title}</h3>
+                    {item.duration && (
+                      <span className="text-lg font-display font-bold text-gold tracking-wide whitespace-nowrap shrink-0 leading-none mt-0.5">
+                        {item.duration}
+                      </span>
+                    )}
+                  </div>
                   <div
                     className="text-sm text-charcoal/60 leading-relaxed line-clamp-2"
                     dangerouslySetInnerHTML={{ __html: formatDescription(item.description) }}
@@ -279,6 +280,7 @@ export default function TrainingSection() {
                   <label className="block text-sm font-medium text-charcoal/70 mb-1">Описание</label>
                   <textarea value={modalDesc} onChange={e => setModalDesc(e.target.value)} rows={4}
                     className="w-full px-4 py-2.5 rounded-xl border border-sage/20 bg-white focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all resize-none" />
+                  <p className="text-xs text-charcoal/40 mt-1.5">**жирный**, *курсив*, __подчеркнутый__, - подпункт</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-charcoal/70 mb-1">Изображение</label>
@@ -345,23 +347,34 @@ export default function TrainingSection() {
                     {selectedItem.price && (
                       <span className="px-3 py-1 bg-gold/15 text-gold font-semibold text-sm rounded-full">{selectedItem.price} ₽</span>
                     )}
+                  </div>
+                  <div className="flex items-center justify-between gap-4 mb-6">
+                    <h3 className="text-2xl font-display text-brand-dark">{selectedItem.title}</h3>
                     {selectedItem.duration && (
-                      <span className="px-3 py-1 bg-brand/10 text-brand/70 text-sm rounded-full flex items-center gap-1.5">
-                        <FiClock size={12} /> {selectedItem.duration}
+                      <span className="text-2xl font-display font-bold text-gold tracking-wide whitespace-nowrap shrink-0 leading-none">
+                        {selectedItem.duration}
                       </span>
                     )}
                   </div>
-                  <h3 className="text-2xl font-display text-brand-dark mb-3">{selectedItem.title}</h3>
                   <div className="text-sm text-charcoal/70 leading-relaxed mb-6"
                     dangerouslySetInnerHTML={{ __html: formatDescription(selectedItem.description) }} />
 
                   <div className="border-t border-sage/15 pt-6">
                     <div
-                      className="rounded-xl overflow-hidden card-shadow select-none relative bg-cream"
+                      className="rounded-xl overflow-hidden card-shadow select-none relative bg-cream print:hidden"
                       onContextMenu={e => e.preventDefault()}
                       style={{ aspectRatio: '16/11', backgroundImage: `url(${certImage})`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
                     >
                       <div className="absolute inset-0" style={{ userSelect: 'none', WebkitUserSelect: 'none' }} />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>
+                        <span className="text-white/20 text-3xl sm:text-4xl md:text-5xl font-display font-bold tracking-[0.25em] -rotate-[25deg] whitespace-nowrap select-none" style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>
+                          СЕРТИФИКАТ
+                        </span>
+                      </div>
+                      <div className="absolute inset-0 pointer-events-none select-none" style={{
+                        userSelect: 'none', WebkitUserSelect: 'none',
+                        backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(255,255,255,0.04) 40px, rgba(255,255,255,0.04) 80px)'
+                      }} />
                     </div>
                     <p className="text-xs text-charcoal/50 text-center mt-3 leading-relaxed">
                       После прохождения мастер-класса по массажу выдается сертификат участника

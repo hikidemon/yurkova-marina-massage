@@ -2,8 +2,16 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { FiX, FiChevronLeft, FiChevronRight, FiMaximize2 } from 'react-icons/fi'
 
-const imageModules = import.meta.glob('/src/assets/z*.webp', { eager: true, query: '?url', import: 'default' })
-const galleryImages = Object.values(imageModules).filter(Boolean) as string[]
+const imageModules = import.meta.glob('/src/assets/{z*.*,d*.*,f*.*}', { eager: true, query: '?url', import: 'default' })
+const galleryImages = Object.values(imageModules)
+  .filter((src): src is string => Boolean(src) && !(src as string).includes('/f1.') && !(src as string).includes('/gwa'))
+  .sort((a, b) => {
+    const aIsZ = /\/z/i.test(a)
+    const bIsZ = /\/z/i.test(b)
+    if (aIsZ && !bIsZ) return -1
+    if (!aIsZ && bIsZ) return 1
+    return a.localeCompare(b)
+  })
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },

@@ -38,7 +38,7 @@ export default function Header() {
         <a href="#hero" className="flex items-center gap-2 sm:gap-3 group">
           <img src={logo} alt="Массажный кабинет" className="h-8 sm:h-10 w-auto rounded-full ring-2 ring-gold/20 group-hover:ring-gold/40 transition-all" />
           <div className="hidden sm:block">
-            <p className="text-sm font-bold font-display leading-tight tracking-wide" style={{ color: scrolled ? '#1A2226' : '#F8F4EF' }}>Yurkova marina massage</p>
+            <p className="text-sm font-bold font-display leading-tight tracking-wide" style={{ color: scrolled ? '#1A2226' : '#F8F4EF' }}>Marina Yurkova massage</p>
           </div>
         </a>
 

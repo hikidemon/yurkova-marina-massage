@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiCheck, FiUpload, FiAlertCircle, FiSave } from 'react-icons/fi'
-import { getServices, addService, updateService, deleteService, uploadImage, type Service, type Detail } from '@/api/api'
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiCheck, FiUpload, FiAlertCircle } from 'react-icons/fi'
+import { getServices, addService, updateService, deleteService, uploadImage, getServiceDuration, setServiceDuration, type Service } from '@/api/api'
 import { formatDescription } from '@/utils/formatDescription'
 
 const adminKey = import.meta.env.VITE_ADMIN_KEY
@@ -21,11 +21,7 @@ export default function ServicesSection() {
 
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [showDetailModal, setShowDetailModal] = useState(false)
-  const [details, setDetails] = useState<Detail[]>([])
-  const [newDetail, setNewDetail] = useState<Detail>({ name: '', duration: '', price: '' })
-  const [editingDetailIndex, setEditingDetailIndex] = useState<number | null>(null)
-  const [saving, setSaving] = useState(false)
-  const [detailsDirty, setDetailsDirty] = useState(false)
+  const [modalDuration, setModalDuration] = useState('')
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -49,6 +45,7 @@ export default function ServicesSection() {
     setModalTitle('')
     setModalDesc('')
     setModalImage('')
+    setModalDuration('')
     setUploadedFile(null)
     setShowModal(true)
   }
@@ -59,6 +56,7 @@ export default function ServicesSection() {
     setModalTitle(s.title)
     setModalDesc(s.description)
     setModalImage(s.image)
+    setModalDuration(getServiceDuration(s))
     setUploadedFile(null)
     setShowModal(true)
   }
@@ -66,9 +64,11 @@ export default function ServicesSection() {
   async function handleSave() {
     const image = uploadedFile ? await uploadImage(uploadedFile) : modalImage
     if (isNew) {
-      await addService({ title: modalTitle, description: modalDesc, image, price: '', details: [] })
+      const details = setServiceDuration([], modalDuration)
+      await addService({ title: modalTitle, description: modalDesc, image, price: '', details })
     } else if (editingService) {
-      await updateService(editingService.id, { title: modalTitle, description: modalDesc, image })
+      const details = setServiceDuration(editingService.details || [], modalDuration)
+      await updateService(editingService.id, { title: modalTitle, description: modalDesc, image, details })
     }
     setShowModal(false)
     fetchServices()
@@ -83,46 +83,47 @@ export default function ServicesSection() {
 
   function openDetails(s: Service) {
     setSelectedService(s)
-    setDetails(s.details ? [...s.details] : [])
-    setNewDetail({ name: '', duration: '', price: '' })
-    setEditingDetailIndex(null)
-    setDetailsDirty(false)
     setShowDetailModal(true)
-  }
-
-  async function handleSaveDetails() {
-    if (!selectedService) return
-    setSaving(true)
-    try {
-      const updated = await updateService(selectedService.id, { details } as Partial<Service>)
-      setSelectedService(updated)
-      setServices(prev => prev.map(s => s.id === updated.id ? updated : s))
-    } catch (err) {
-      console.error('Ошибка сохранения деталей:', err)
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  function handleAddDetail() {
-    if (!newDetail.name.trim() && !newDetail.duration.trim() && !newDetail.price.trim()) return
-    setDetails(prev => [...prev, { ...newDetail }])
-    setNewDetail({ name: '', duration: '', price: '' })
-    setDetailsDirty(true)
-  }
-
-  function handleDeleteDetail(index: number) {
-    setDetails(prev => prev.filter((_, i) => i !== index))
-    setDetailsDirty(true)
-  }
-
-  function handleUpdateDetail(index: number, field: keyof Detail, value: string) {
-    setDetails(prev => prev.map((d, i) => i === index ? { ...d, [field]: value } : d))
-    setDetailsDirty(true)
   }
 
   return (
     <section id="services" className="py-20 sm:py-28 bg-cream relative">
+      <style>{`
+        .fmt-subitem {
+          display: block;
+          padding-left: 1.25rem;
+          position: relative;
+          margin: 0;
+          color: rgba(40,35,30,0.7);
+          font-size: 0.875rem;
+          line-height: 1.4;
+        }
+        .fmt-subitem::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0.55em;
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: #b8944c;
+        }
+        .fmt-subheading {
+          font-family: var(--font-display, 'Georgia', serif);
+          color: #2b2925;
+          margin-top: 1rem;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+        }
+        h2.fmt-subheading { font-size: 1.25rem; }
+        h3.fmt-subheading { font-size: 1.1rem; }
+        h4.fmt-subheading { font-size: 1rem; }
+        .fmt-underline {
+          text-decoration: underline;
+          text-decoration-color: #b8944c;
+          text-underline-offset: 2px;
+        }
+      `}</style>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -178,7 +179,14 @@ export default function ServicesSection() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
                 <div className="p-5 sm:p-6">
-                  <h3 className="text-lg font-display text-brand-dark font-semibold mb-2">{service.title}</h3>
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <h3 className="text-lg font-display text-brand-dark font-semibold">{service.title}</h3>
+                    {getServiceDuration(service) && (
+                      <span className="text-lg font-display font-bold text-gold tracking-wide whitespace-nowrap shrink-0 leading-none mt-0.5">
+                        {getServiceDuration(service)}
+                      </span>
+                    )}
+                  </div>
                   <div
                     className="text-sm text-charcoal/60 leading-relaxed line-clamp-2"
                     dangerouslySetInnerHTML={{ __html: formatDescription(service.description) }}
@@ -241,6 +249,12 @@ export default function ServicesSection() {
                   <label className="block text-sm font-medium text-charcoal/70 mb-1">Описание</label>
                   <textarea value={modalDesc} onChange={e => setModalDesc(e.target.value)} rows={4}
                     className="w-full px-4 py-2.5 rounded-xl border border-sage/20 bg-white focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all resize-none" />
+                  <p className="text-xs text-charcoal/40 mt-1.5">**жирный**, *курсив*, __подчеркнутый__, - подпункт</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-charcoal/70 mb-1">Длительность сеанса</label>
+                  <input value={modalDuration} onChange={e => setModalDuration(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-sage/20 bg-white focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all" placeholder="например: 60 мин" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-charcoal/70 mb-1">Изображение</label>
@@ -303,95 +317,16 @@ export default function ServicesSection() {
                   </div>
                 )}
                 <div className="p-6 sm:p-8">
-                  <h3 className="text-2xl font-display text-brand-dark mb-3">{selectedService.title}</h3>
-                  <div className="text-sm text-charcoal/70 leading-relaxed mb-6"
-                    dangerouslySetInnerHTML={{ __html: formatDescription(selectedService.description) }} />
-
-                  <div className="border-t border-sage/15 pt-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-sm font-semibold text-brand-dark uppercase tracking-wider">Программы</h4>
-                      {details.length > 0 && (
-                        <span className="text-xs text-charcoal/40">{details.length} позиций</span>
-                      )}
-                    </div>
-
-                    {details.length > 0 ? (
-                      <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1 custom-scroll">
-                        <div className="hidden sm:grid sm:grid-cols-[1fr_0.7fr_2fr_auto] gap-3 px-4 py-2 text-xs text-charcoal/40 uppercase tracking-wider font-medium sticky top-0 bg-cream-light z-10">
-                          <span>Название</span>
-                          <span>Время</span>
-                          <span>Описание</span>
-                          {isAdmin && <span className="text-center">Действия</span>}
-                        </div>
-                        {details.map((d, i) => (
-                          <div key={i}
-                            className={`grid grid-cols-1 sm:grid-cols-[1fr_0.7fr_2fr_auto] gap-2 sm:gap-3 py-3 px-4 rounded-xl transition-colors ${
-                              editingDetailIndex === i ? 'bg-brand/5 ring-1 ring-brand/20' : 'bg-cream hover:bg-cream/80'
-                            }`}
-                          >
-                            {editingDetailIndex === i ? (
-                              <>
-                                <input value={d.name} onChange={e => handleUpdateDetail(i, 'name', e.target.value)}
-                                  className="px-3 py-1.5 rounded-lg border border-sage/20 bg-white text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none w-full" placeholder="Название" />
-                                <input value={d.duration} onChange={e => handleUpdateDetail(i, 'duration', e.target.value)}
-                                  className="px-3 py-1.5 rounded-lg border border-sage/20 bg-white text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none w-full" placeholder="мин" />
-                                <textarea value={d.price} onChange={e => handleUpdateDetail(i, 'price', e.target.value)} rows={2}
-                                  className="px-3 py-1.5 rounded-lg border border-sage/20 bg-white text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none resize-none w-full" placeholder="Описание процедуры" />
-                                <div className="flex gap-1 items-center">
-                                  <button onClick={() => setEditingDetailIndex(null)}
-                                    className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"><FiCheck size={14} /></button>
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <div className="min-w-0">
-                                  <span className="text-xs text-charcoal/40 sm:hidden">Название: </span>
-                                  <span className="font-medium text-charcoal text-sm break-words">{d.name}</span>
-                                </div>
-                                <div>
-                                  <span className="text-xs text-charcoal/40 sm:hidden">Время: </span>
-                                  <span className="text-brand text-sm whitespace-nowrap">{d.duration} мин</span>
-                                </div>
-                                <div className="min-w-0">
-                                  <span className="text-xs text-charcoal/40 sm:hidden">Описание: </span>
-                                  <span className="text-charcoal/70 text-sm break-words line-clamp-2">{d.price || '—'}</span>
-                                </div>
-                                {isAdmin && (
-                                  <div className="flex gap-1 items-center sm:justify-center">
-                                    <button onClick={() => setEditingDetailIndex(i)}
-                                      className="p-1.5 text-charcoal/40 hover:text-brand hover:bg-brand/5 rounded-lg transition-all shrink-0"><FiEdit2 size={13} /></button>
-                                    <button onClick={() => handleDeleteDetail(i)}
-                                      className="p-1.5 text-charcoal/40 hover:text-terracotta hover:bg-terracotta/5 rounded-lg transition-all shrink-0"><FiTrash2 size={13} /></button>
-                                  </div>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-charcoal/40 text-sm bg-cream rounded-xl">
-                        <p>Нет добавленных программ</p>
-                      </div>
-                    )}
-
-                    {isAdmin && (
-                      <div className="mt-4 p-4 bg-brand/5 rounded-xl border border-dashed border-brand/20">
-                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-3">
-                          <input value={newDetail.name} onChange={e => setNewDetail({ ...newDetail, name: e.target.value })}
-                            className="px-3 py-2 rounded-lg border border-sage/20 bg-white text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none w-full" placeholder="Название" />
-                          <input value={newDetail.duration} onChange={e => setNewDetail({ ...newDetail, duration: e.target.value })}
-                            className="px-3 py-2 rounded-lg border border-sage/20 bg-white text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none w-full" placeholder="Время (мин)" />
-                          <textarea value={newDetail.price} onChange={e => setNewDetail({ ...newDetail, price: e.target.value })} rows={2}
-                            className="px-3 py-2 rounded-lg border border-sage/20 bg-white text-sm focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none resize-none w-full" placeholder="Описание процедуры" />
-                          <button onClick={handleAddDetail}
-                            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-brand text-cream-light text-sm font-medium rounded-lg hover:bg-brand-light transition-all">
-                            <FiPlus size={14} /> Добавить
-                          </button>
-                        </div>
-                      </div>
+                  <div className="flex items-center justify-between gap-4 mb-6">
+                    <h3 className="text-2xl font-display text-brand-dark">{selectedService.title}</h3>
+                    {getServiceDuration(selectedService) && (
+                      <span className="text-2xl font-display font-bold text-gold tracking-wide whitespace-nowrap shrink-0 leading-none">
+                        {getServiceDuration(selectedService)}
+                      </span>
                     )}
                   </div>
+                  <div className="text-sm text-charcoal/70 leading-relaxed mb-6"
+                    dangerouslySetInnerHTML={{ __html: formatDescription(selectedService.description) }} />
 
                   <div className="mt-6 flex flex-wrap gap-3">
                     <a href="#contacts"
@@ -399,12 +334,6 @@ export default function ServicesSection() {
                       className="px-6 py-2.5 bg-gold text-charcoal font-semibold rounded-full text-sm hover:bg-gold-light transition-all">
                       Записаться
                     </a>
-                    {isAdmin && detailsDirty && (
-                      <button onClick={handleSaveDetails} disabled={saving}
-                        className="px-6 py-2.5 bg-brand text-cream-light font-semibold rounded-full text-sm hover:bg-brand-light transition-all flex items-center gap-2 disabled:opacity-50">
-                        <FiSave size={14} /> {saving ? 'Сохранение...' : 'Сохранить изменения'}
-                      </button>
-                    )}
                     <button onClick={() => setShowDetailModal(false)}
                       className="px-6 py-2.5 border border-sage/30 text-charcoal/60 rounded-full text-sm hover:bg-sage/5 transition-all">
                       Закрыть
